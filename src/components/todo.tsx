@@ -8,13 +8,13 @@ interface todo {
   completed: boolean;
 }
 
-
+const url = "http://localhost:5000"
 function Todo() {  
   const [todos, setTodos] = useState<todo[]>([]);
   const [newTodo, setNewTodo] = useState('');
 
   const fetchTodos = async () => {  
-      const response = await fetch("http://localhost:5000/get_tasks");
+      const response = await fetch(`${url}/get_tasks`);
       if (response.status) {
           const data = await response.json();
           setTodos(data); 
@@ -29,7 +29,7 @@ const addTodo = async (e: React.FormEvent) => {
     if (newTodo.trim()) {
 
         try {
-      const response = await axios.get("http://localhost:5000/add_task")
+      const response = await axios.get(`${url}/add_task`)
           if ((await response).status===200) {
               setNewTodo('');
               fetchTodos(); 
