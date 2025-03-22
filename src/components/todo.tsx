@@ -8,7 +8,7 @@ interface todo {
   completed: boolean;
 }
 
-const url = "http://localhost:5000"
+const url = "mysql://root:GBCfvFiRGOwwwKIKJIBqCTgkgUBHJjwm@shinkansen.proxy.rlwy.net:11479/railway"
 function Todo() {  
   const [todos, setTodos] = useState<todo[]>([]);
   const [newTodo, setNewTodo] = useState('');
