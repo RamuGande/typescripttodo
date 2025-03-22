@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlusCircle, CheckCircle2, XCircle, ClipboardList } from 'lucide-react';
 import axios from 'axios';
 
@@ -14,39 +14,37 @@ function Todo() {
   const [newTodo, setNewTodo] = useState('');
 
   const fetchTodos = async () => {  
-      const response = await fetch(`${url}/get_tasks`);
+      const response = await fetch(`${url}/todo/get_tasks`);
       if (response.status) {
           const data = await response.json();
-          setTodos(data); 
+          setTodos(data[0]); 
+          console.log(todos);
       }
   };
 
-const addTodo = async (e: React.FormEvent) => {
-    
+  useEffect(() => {
+      fetchTodos();
+  }, []);
 
+  const addTodo = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (newTodo.trim()) {
-
         try {
-      const response = await axios.get(`${url}/add_task`)
-          if ((await response).status===200) {
-              setNewTodo('');
-              fetchTodos(); 
-          }
-          else{
-            console.log("nooo");
-          }
-        } 
-        catch (err) {
-          console.error(err);
+            const response = await axios.post(`${url}/todo/add_task`, { task: newTodo });
+            if (response.status === 200) {
+                setNewTodo('');
+                fetchTodos(); 
+            } else {
+                console.log("nooo");
+            }
+        } catch (err) {
+            console.error(err);
         }
-      }
-      else 
-      {
+    } else {
         alert("Please enter a task");
-      }
-  };
+    }
+};
 
   const toggleTodo = (id: number) => {  
       setTodos(todos.map(todo =>
@@ -55,10 +53,9 @@ const addTodo = async (e: React.FormEvent) => {
   };
 
   const removeTodo = async (id: number) => {  
-      const response = await axios.post("http://localhost:5000/remove_task") 
 
-         
-      if (response.status===200) {
+      const response = await axios.post(`${url}/todo/remove_task`, { id }); 
+      if (response.status === 200) {
           fetchTodos(); 
       }
   };
@@ -98,7 +95,8 @@ const addTodo = async (e: React.FormEvent) => {
                           >
                               <div className="flex items-center gap-3">
                                   <button
-                                      onClick={() => toggleTodo(todo.id)}
+                                  onClick={() => { toggleTodo(todo.id); }}
+
                                       className={`${
                                           todo.completed ? 'text-green-500' : 'text-gray-400'
                                       } hover:text-green-600 transition-colors duration-200`}
@@ -110,11 +108,14 @@ const addTodo = async (e: React.FormEvent) => {
                                           todo.completed ? 'line-through text-gray-400' : 'text-gray-700'
                                       }`}
                                   >
-                                      {todo.text}
+                                      {todo.task}
                                   </span>
                               </div>
                               <button
-                                  onClick={() => removeTodo(todo.id)}
+                                  onClick={() => removeTodo(todo.user_id)}
+                                  id={todo.id ? todo.id.toString() : 'undefined'} 
+
+
                                   className="text-gray-400 hover:text-red-500 transition-colors duration-200"
                               >
                                   <XCircle className="h-5 w-5" />
